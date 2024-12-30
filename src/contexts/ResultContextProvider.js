@@ -8,26 +8,23 @@ export const ResultContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Memoized function to avoid re-creating `getResults` every render
   const getResults = useCallback(async (type) => {
+    console.log(`Fetching results for type: ${type} and search term: ${searchTerm}`);
+
     if (!searchTerm) {
-      console.error('Search term is missing or empty');
+      console.error('Search term is empty');
       return;
     }
 
     setIsLoading(true);
 
     try {
+      // Construct the URL based on type
       let url = `${baseUrl}search?q=${encodeURIComponent(searchTerm)}&num=10`;
 
-      // Adjust endpoint for specific result types
-      if (type === '/news') {
-        url += '&type=news';
-      } else if (type === '/images') {
-        url += '&type=image';
-      } else if (type === '/videos') {
-        url += '&type=video';
-      }
+      if (type === '/news') url += '&type=news';
+      if (type === '/images') url += '&type=image';
+      if (type === '/videos') url += '&type=video';
 
       const response = await fetch(url, {
         method: 'GET',
@@ -42,22 +39,20 @@ export const ResultContextProvider = ({ children }) => {
       }
 
       const data = await response.json();
-
-      // Debug API response structure
       console.log('API Response:', data);
 
-      // Update results based on response structure
+      // Map response data to results based on type
       if (type === '/news') {
-        setResults(data.entries || []);
+        setResults(data.entries || []); // Adjust to match API structure
       } else if (type === '/images') {
-        setResults(data.image_results || []);
+        setResults(data.image_results || []); // Adjust to match API structure
       } else if (type === '/videos') {
-        setResults(data.video_results || []);
+        setResults(data.video_results || []); // Adjust to match API structure
       } else {
-        setResults(data.results || []);
+        setResults(data.results || []); // Default for web results
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching results:', error);
       setResults([]); // Clear results on error
     } finally {
       setIsLoading(false);
@@ -65,15 +60,7 @@ export const ResultContextProvider = ({ children }) => {
   }, [searchTerm]);
 
   return (
-    <ResultContext.Provider
-      value={{
-        getResults,
-        results,
-        searchTerm,
-        setSearchTerm,
-        isLoading,
-      }}
-    >
+    <ResultContext.Provider value={{ getResults, results, searchTerm, setSearchTerm, isLoading }}>
       {children}
     </ResultContext.Provider>
   );
