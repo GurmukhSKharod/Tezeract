@@ -5,14 +5,16 @@ import { useResultContext } from '../contexts/ResultContextProvider';
 import { Links } from './Links';
 
 export const Search = () => {
-  const [text, setText] = useState('Software Development');
+  const [text, setText] = useState('');
   const { setSearchTerm } = useResultContext();
   const [debouncedValue] = useDebounce(text, 300);
 
   useEffect(() => {
-    if (debouncedValue) { setSearchTerm(debouncedValue); }
-  }, [debouncedValue]);
-
+    if (debouncedValue.trim()) {
+      setSearchTerm(debouncedValue.trim());
+    }
+  }, [debouncedValue, setSearchTerm]);
+    
   return (
     <div className="relative sm:ml-48 md:ml-72 sm:-mt-10 mt-3">
       <input
