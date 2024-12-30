@@ -66,8 +66,20 @@ export const ResultContextProvider = ({ children }) => {
 
 
   return (
-    <ResultContext.Provider value={{ getResults, results, searchTerm, setSearchTerm, isLoading, error }}>
-      {children}
+    <ResultContext.Provider
+        value={{
+          getResults,
+          results,
+          searchTerm,
+          setSearchTerm: (term) => {
+            console.log('Setting search term in context:', term);
+            setSearchTerm(term);
+          },
+          isLoading,
+          error,
+        }}
+      >
+        {children}
     </ResultContext.Provider>
   );
 };
