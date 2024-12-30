@@ -10,12 +10,12 @@ export const Search = () => {
   const [debouncedValue] = useDebounce(text, 300);
 
   useEffect(() => {
-    console.log('Debounced Value:', debouncedValue);
     if (debouncedValue.trim()) {
       console.log('Updating search term in context:', debouncedValue.trim());
       setSearchTerm(debouncedValue.trim());
     }
   }, [debouncedValue, setSearchTerm]);
+
     
   return (
     <div className="relative sm:ml-48 md:ml-72 sm:-mt-10 mt-3">
