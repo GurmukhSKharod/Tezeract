@@ -9,6 +9,10 @@ export const ResultContextProvider = ({ children }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    console.log('Search term in context updated to:', searchTerm);
+  }, [searchTerm]);
+
   const getResults = async (type) => {
   console.log('Current Search Term in Context:', searchTerm);
 
