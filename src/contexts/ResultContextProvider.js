@@ -7,6 +7,7 @@ export const ResultContextProvider = ({ children }) => {
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState(null);
 
   const getResults = async (type, searchTerm) => {
 
@@ -20,14 +21,14 @@ export const ResultContextProvider = ({ children }) => {
     console.log('Search Term:', searchTerm);
     
     setIsLoading(true);
+    setError(null);
 
-    let url = `${baseUrl}search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`; // Default for web search
-    
-    // Adjust the endpoint or query parameters for specific types
+    let url = `${baseUrl}search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`;
+
     if (type === 'news') {
-      url += '&type=news'; // Adjust according to API documentation for news
+      url = `${baseUrl}news/search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`;
     } else if (type === 'images') {
-      url += '&type=image'; // Adjust according to API documentation for images
+      url = `${baseUrl}image/search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`;
     }
   
     try {
@@ -55,8 +56,9 @@ export const ResultContextProvider = ({ children }) => {
         setResults(data.results || []); // Default web results
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setResults([]); // Clear results on error
+        console.error('Error fetching data:', error);
+        setError('Failed to fetch results. Please try again.');
+        setResults([]);
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +66,7 @@ export const ResultContextProvider = ({ children }) => {
 
 
   return (
-    <ResultContext.Provider value={{ getResults, results, searchTerm, setSearchTerm, isLoading }}>
+    <ResultContext.Provider value={{ getResults, results, searchTerm, setSearchTerm, isLoading, error }}>
       {children}
     </ResultContext.Provider>
   );
