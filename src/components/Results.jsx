@@ -8,23 +8,28 @@ import { Loading } from './Loading';
 export const Results = () => {
   const { results, isLoading, getResults, searchTerm } = useResultContext();
   const location = useLocation();
-  const [prevSearch, setPrevSearch] = useState('');
+
+  // Prevent repetitive API calls with local state tracking
+  const [lastSearch, setLastSearch] = useState({ term: '', path: '' });
 
   useEffect(() => {
-    if (searchTerm && searchTerm !== prevSearch) {
+    // Only fetch results if the search term or path has changed
+    if (
+      searchTerm &&
+      (searchTerm !== lastSearch.term || location.pathname !== lastSearch.path)
+    ) {
+      setLastSearch({ term: searchTerm, path: location.pathname }); // Update local tracking state
       let type = '/search';
       if (location.pathname === '/news') type = '/news';
       if (location.pathname === '/images') type = '/images';
       if (location.pathname === '/videos') type = '/videos';
-
-      setPrevSearch(searchTerm); // Update the last search term
       getResults(type);
     }
-  }, [searchTerm, location.pathname, getResults, prevSearch]);
+  }, [searchTerm, location.pathname, lastSearch, getResults]);
 
   if (isLoading) return <Loading />;
 
-  console.log('Results state:', results); // Log the results for debugging
+  console.log('Results state:', results); // Debug: Check results state
 
   if (!results || results.length === 0) {
     return <p className="text-center mt-10 text-lg">No results found</p>;
@@ -40,7 +45,9 @@ export const Results = () => {
                 <p className="text-sm">
                   {link?.length > 30 ? link.substring(0, 30) : link}
                 </p>
-                <p className="text-lg hover:underline dark:text-blue-300 text-blue-700">{title}</p>
+                <p className="text-lg hover:underline dark:text-blue-300 text-blue-700">
+                  {title}
+                </p>
               </a>
             </div>
           ))}
@@ -58,7 +65,9 @@ export const Results = () => {
               className="sm:p-3 p-5"
             >
               {image?.src && <img src={image.src} alt="img" loading="lazy" />}
-              <p className="sm:w-36 w-36 break-words text-sm mt-2">{link?.title}</p>
+              <p className="sm:w-36 w-36 break-words text-sm mt-2">
+                {link?.title}
+              </p>
             </a>
           ))}
         </div>
@@ -74,7 +83,9 @@ export const Results = () => {
                 rel="noreferrer"
                 className="hover:underline"
               >
-                <p className="text-lg dark:text-blue-300 text-blue-700">{title}</p>
+                <p className="text-lg dark:text-blue-300 text-blue-700">
+                  {title}
+                </p>
               </a>
               <div className="flex gap-4">
                 <a
