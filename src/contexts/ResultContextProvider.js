@@ -24,9 +24,8 @@ export const ResultContextProvider = ({ children }) => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'x-user-agent': 'desktop',
-        'x-rapidapi-host': 'google-search72.p.rapidapi.com',
         'x-rapidapi-key': '0e63808c81msh5ec38a736a4c9f5p1a3376jsne401f2217f52',
+        'x-rapidapi-host': 'google-search72.p.rapidapi.com',
       },
     });
 
