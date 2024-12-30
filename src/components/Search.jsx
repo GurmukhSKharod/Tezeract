@@ -10,7 +10,7 @@ export const Search = () => {
   const [debouncedValue] = useDebounce(text, 300);
 
   useEffect(() => {
-    if (debouncedValue) {setSearchTerm(debouncedValue)};
+    if (debouncedValue) { setSearchTerm(debouncedValue); }
   }, [debouncedValue]);
 
   return (
