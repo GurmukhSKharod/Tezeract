@@ -8,16 +8,19 @@ import { Loading } from './Loading';
 export const Results = () => {
   const { results, isLoading, getResults, searchTerm } = useResultContext();
   const location = useLocation();
-  const [lastRequest, setLastRequest] = useState({ term: '', path: '' });
+
+  // Track the last search to prevent infinite loops
+  const [lastSearch, setLastSearch] = useState({ term: '', path: '' });
 
   useEffect(() => {
-    // Prevent redundant API calls
     if (
       searchTerm &&
-      (searchTerm !== lastRequest.term || location.pathname !== lastRequest.path)
+      (searchTerm !== lastSearch.term || location.pathname !== lastSearch.path)
     ) {
-      setLastRequest({ term: searchTerm, path: location.pathname });
+      console.log('Triggering getResults...');
+      setLastSearch({ term: searchTerm, path: location.pathname });
 
+      // Determine type based on path
       let type = '/search';
       if (location.pathname === '/news') type = '/news';
       if (location.pathname === '/images') type = '/images';
@@ -25,7 +28,7 @@ export const Results = () => {
 
       getResults(type);
     }
-  }, [searchTerm, location.pathname, lastRequest, getResults]);
+  }, [searchTerm, location.pathname, lastSearch, getResults]);
 
   if (isLoading) return <Loading />;
 
@@ -42,9 +45,7 @@ export const Results = () => {
           {results.map(({ link, title }, index) => (
             <div key={index} className="md:w-2/5 w-full">
               <a href={link} target="_blank" rel="noreferrer">
-                <p className="text-sm">
-                  {link?.length > 30 ? link.substring(0, 30) : link}
-                </p>
+                <p className="text-sm">{link?.length > 30 ? link.substring(0, 30) : link}</p>
                 <p className="text-lg hover:underline dark:text-blue-300 text-blue-700">{title}</p>
               </a>
             </div>
@@ -55,8 +56,8 @@ export const Results = () => {
       return (
         <div className="flex flex-wrap justify-center items-center">
           {results.map(({ image, link }, index) => (
-            <a href={link?.href} target="_blank" rel="noreferrer" className="sm:p-3 p-5" key={index}>
-              <img src={image?.src} alt={link?.title} loading="lazy" />
+            <a href={link?.href} target="_blank" key={index} rel="noreferrer" className="sm:p-3 p-5">
+              {image?.src && <img src={image.src} alt="img" loading="lazy" />}
               <p className="sm:w-36 w-36 break-words text-sm mt-2">{link?.title}</p>
             </a>
           ))}
@@ -85,12 +86,7 @@ export const Results = () => {
           {results.map((video, index) => (
             <div key={index} className="p-2">
               {video?.additional_links?.[0]?.href && (
-                <ReactPlayer
-                  url={video.additional_links[0].href}
-                  controls
-                  width="355px"
-                  height="200px"
-                />
+                <ReactPlayer url={video.additional_links[0].href} controls width="355px" height="200px" />
               )}
             </div>
           ))}
