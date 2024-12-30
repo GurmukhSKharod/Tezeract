@@ -9,59 +9,53 @@ export const ResultContextProvider = ({ children }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
 
-  const getResults = async (type, searchTerm) => {
+  const getResults = async (type) => {
+  console.log('Current Search Term in Context:', searchTerm);
 
-    console.log('Search Term:', searchTerm);
-    
-    if (!searchTerm || searchTerm.trim() === '') {
-      console.error('Search term is missing or empty');
-      return;
+  if (!searchTerm || searchTerm.trim() === '') {
+    console.error('Search term is missing or empty');
+    return;
+  }
+
+  setIsLoading(true);
+
+  let url = `${baseUrl}search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`;
+
+  if (type === 'news') {
+    url = `${baseUrl}news/search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`;
+  } else if (type === 'images') {
+    url = `${baseUrl}image/search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`;
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'x-rapidapi-key': '0e63808c81msh5ec38a736a4c9f5p1a3376jsne401f2217f52',
+        'x-rapidapi-host': 'google-search72.p.rapidapi.com',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
     }
 
-    console.log('Search Term:', searchTerm);
-    
-    setIsLoading(true);
-    setError(null);
-
-    let url = `${baseUrl}search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`;
+    const data = await response.json();
+    console.log('API Response:', data);
 
     if (type === 'news') {
-      url = `${baseUrl}news/search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`;
+      setResults(data.entries || []);
     } else if (type === 'images') {
-      url = `${baseUrl}image/search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`;
+      setResults(data.image_results || []);
+    } else {
+      setResults(data.results || []);
     }
-  
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': '0e63808c81msh5ec38a736a4c9f5p1a3376jsne401f2217f52',
-          'x-rapidapi-host': 'google-search72.p.rapidapi.com',
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
-      }
-  
-      const data = await response.json();
-      console.log('API Response:', data);
-  
-      // Update the results based on the type of data returned
-      if (type === 'news') {
-        setResults(data.entries || []); // Assuming 'entries' contains news results
-      } else if (type === 'images') {
-        setResults(data.image_results || []); // Assuming 'image_results' contains image results
-      } else {
-        setResults(data.results || []); // Default web results
-      }
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to fetch results. Please try again.');
-        setResults([]);
-    } finally {
-      setIsLoading(false);
-    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    setResults([]);
+  } finally {
+    setIsLoading(false);
+  }
 };
 
 
