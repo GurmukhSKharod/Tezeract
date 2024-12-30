@@ -9,11 +9,15 @@ export const ResultContextProvider = ({ children }) => {
   const [searchTerm, setSearchTerm] = useState('Software Development');
 
   const getResults = async (type, searchTerm) => {
+
+    console.log('Search Term:', searchTerm);
     
     if (!searchTerm || searchTerm.trim() === '') {
       console.error('Search term is missing or empty');
       return;
     }
+
+    console.log('Search Term:', searchTerm);
     
     setIsLoading(true);
 
