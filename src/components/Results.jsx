@@ -9,32 +9,39 @@ export const Results = () => {
   const { results, isLoading, getResults, searchTerm } = useResultContext();
   const location = useLocation();
 
-  // Prevent repetitive API calls with local state tracking
-  const [lastSearch, setLastSearch] = useState({ term: '', path: '' });
+  // Local state to avoid infinite loops
+  const [prevSearch, setPrevSearch] = useState({ term: '', path: '' });
 
   useEffect(() => {
-    // Only fetch results if the search term or path has changed
+    // Prevent repeated API calls with a condition
     if (
       searchTerm &&
-      (searchTerm !== lastSearch.term || location.pathname !== lastSearch.path)
+      (searchTerm !== prevSearch.term || location.pathname !== prevSearch.path)
     ) {
-      setLastSearch({ term: searchTerm, path: location.pathname }); // Update local tracking state
+      setPrevSearch({ term: searchTerm, path: location.pathname });
+
+      // Determine API endpoint type based on route
       let type = '/search';
       if (location.pathname === '/news') type = '/news';
       if (location.pathname === '/images') type = '/images';
       if (location.pathname === '/videos') type = '/videos';
-      getResults(type);
-    }
-  }, [searchTerm, location.pathname, lastSearch, getResults]);
 
+      getResults(type, searchTerm); // Call the API
+    }
+  }, [searchTerm, location.pathname, prevSearch, getResults]);
+
+  // Debugging: Check results and API responses
+  console.log('Results state:', results);
+
+  // If loading, show the loading spinner
   if (isLoading) return <Loading />;
 
-  console.log('Results state:', results); // Debug: Check results state
-
+  // Handle empty results
   if (!results || results.length === 0) {
     return <p className="text-center mt-10 text-lg">No results found</p>;
   }
 
+  // Render results based on the route
   switch (location.pathname) {
     case '/search':
       return (
@@ -45,9 +52,7 @@ export const Results = () => {
                 <p className="text-sm">
                   {link?.length > 30 ? link.substring(0, 30) : link}
                 </p>
-                <p className="text-lg hover:underline dark:text-blue-300 text-blue-700">
-                  {title}
-                </p>
+                <p className="text-lg hover:underline dark:text-blue-300 text-blue-700">{title}</p>
               </a>
             </div>
           ))}
