@@ -8,40 +8,33 @@ import { Loading } from './Loading';
 export const Results = () => {
   const { results, isLoading, getResults, searchTerm } = useResultContext();
   const location = useLocation();
-
-  // Local state to avoid infinite loops
-  const [prevSearch, setPrevSearch] = useState({ term: '', path: '' });
+  const [lastRequest, setLastRequest] = useState({ term: '', path: '' });
 
   useEffect(() => {
-    // Prevent repeated API calls with a condition
+    // Prevent redundant API calls
     if (
       searchTerm &&
-      (searchTerm !== prevSearch.term || location.pathname !== prevSearch.path)
+      (searchTerm !== lastRequest.term || location.pathname !== lastRequest.path)
     ) {
-      setPrevSearch({ term: searchTerm, path: location.pathname });
+      setLastRequest({ term: searchTerm, path: location.pathname });
 
-      // Determine API endpoint type based on route
       let type = '/search';
       if (location.pathname === '/news') type = '/news';
       if (location.pathname === '/images') type = '/images';
       if (location.pathname === '/videos') type = '/videos';
 
-      getResults(type, searchTerm); // Call the API
+      getResults(type);
     }
-  }, [searchTerm, location.pathname, prevSearch, getResults]);
+  }, [searchTerm, location.pathname, lastRequest, getResults]);
 
-  // Debugging: Check results and API responses
-  console.log('Results state:', results);
-
-  // If loading, show the loading spinner
   if (isLoading) return <Loading />;
 
-  // Handle empty results
+  console.log('Results:', results);
+
   if (!results || results.length === 0) {
     return <p className="text-center mt-10 text-lg">No results found</p>;
   }
 
-  // Render results based on the route
   switch (location.pathname) {
     case '/search':
       return (
@@ -62,17 +55,9 @@ export const Results = () => {
       return (
         <div className="flex flex-wrap justify-center items-center">
           {results.map(({ image, link }, index) => (
-            <a
-              href={link?.href}
-              target="_blank"
-              key={index}
-              rel="noreferrer"
-              className="sm:p-3 p-5"
-            >
-              {image?.src && <img src={image.src} alt="img" loading="lazy" />}
-              <p className="sm:w-36 w-36 break-words text-sm mt-2">
-                {link?.title}
-              </p>
+            <a href={link?.href} target="_blank" rel="noreferrer" className="sm:p-3 p-5" key={index}>
+              <img src={image?.src} alt={link?.title} loading="lazy" />
+              <p className="sm:w-36 w-36 break-words text-sm mt-2">{link?.title}</p>
             </a>
           ))}
         </div>
@@ -82,23 +67,11 @@ export const Results = () => {
         <div className="sm:px-56 flex flex-wrap justify-between items-center space-y-6">
           {results.map(({ id, links, source, title }) => (
             <div key={id} className="md:w-2/5 w-full">
-              <a
-                href={links?.[0]?.href}
-                target="_blank"
-                rel="noreferrer"
-                className="hover:underline"
-              >
-                <p className="text-lg dark:text-blue-300 text-blue-700">
-                  {title}
-                </p>
+              <a href={links?.[0]?.href} target="_blank" rel="noreferrer" className="hover:underline">
+                <p className="text-lg dark:text-blue-300 text-blue-700">{title}</p>
               </a>
               <div className="flex gap-4">
-                <a
-                  href={source?.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:underline hover:text-blue-300"
-                >
+                <a href={source?.href} target="_blank" rel="noreferrer" className="hover:underline hover:text-blue-300">
                   {source?.href}
                 </a>
               </div>
