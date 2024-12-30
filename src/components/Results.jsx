@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import ReactPlayer from 'react-player';
 
@@ -8,20 +8,23 @@ import { Loading } from './Loading';
 export const Results = () => {
   const { results, isLoading, getResults, searchTerm } = useResultContext();
   const location = useLocation();
+  const [prevSearch, setPrevSearch] = useState('');
 
   useEffect(() => {
-    if (searchTerm) {
+    if (searchTerm && searchTerm !== prevSearch) {
       let type = '/search';
       if (location.pathname === '/news') type = '/news';
       if (location.pathname === '/images') type = '/images';
       if (location.pathname === '/videos') type = '/videos';
+
+      setPrevSearch(searchTerm); // Update the last search term
       getResults(type);
     }
-  }, [searchTerm, location.pathname]);
+  }, [searchTerm, location.pathname, getResults, prevSearch]);
 
   if (isLoading) return <Loading />;
 
-  console.log('Results state:', results); // Log the results to debug
+  console.log('Results state:', results); // Log the results for debugging
 
   if (!results || results.length === 0) {
     return <p className="text-center mt-10 text-lg">No results found</p>;
