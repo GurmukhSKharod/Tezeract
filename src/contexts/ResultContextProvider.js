@@ -8,30 +8,50 @@ export const ResultContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('Software Development');
 
-  const getResults = async (type) => {
-    setIsLoading(true);
+  const getResults = async (type, searchTerm) => {
+  setIsLoading(true);
 
-    const response = await fetch(`${baseUrl}${type}`, {
+  let url = `${baseUrl}search?q=${searchTerm}&num=10`; // Default for web search
+  
+  // Adjust the endpoint or query parameters for specific types
+  if (type === 'news') {
+    url += '&type=news'; // Adjust according to API documentation for news
+  } else if (type === 'images') {
+    url += '&type=image'; // Adjust according to API documentation for images
+  }
+
+  try {
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'x-user-agent': 'desktop',
         'x-rapidapi-host': 'google-search72.p.rapidapi.com',
-        'x-rapidapi-key': '0e63808c81msh5ec38a736a4c9f5p1a3376jsne401f2217f52'
-      }
-    }); 
+        'x-rapidapi-key': 'your_api_key_here',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
 
     const data = await response.json();
 
-    if(type.includes('/news')){
-        setResults(data.entries);
-    }else if(type.includes('/images')){
-        setResults(data.image_results);
-    }else {
-        setResults(data.results);
+    // Update the results based on the type of data returned
+    if (type === 'news') {
+      setResults(data.entries || []); // Assuming 'entries' contains news results
+    } else if (type === 'images') {
+      setResults(data.image_results || []); // Assuming 'image_results' contains image results
+    } else {
+      setResults(data.results || []); // Default web results
     }
-
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    setResults([]); // Clear results on error
+  } finally {
     setIsLoading(false);
-  };
+  }
+};
+
 
   return (
     <ResultContext.Provider value={{ getResults, results, searchTerm, setSearchTerm, isLoading }}>
