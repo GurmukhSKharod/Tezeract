@@ -13,9 +13,9 @@ export const ResultContextProvider = ({ children }) => {
       console.error('Search term is missing');
       return;
     }
-
+  
     setIsLoading(true);
-
+  
     try {
       const url = `${baseUrl}search?q=${encodeURIComponent(searchTerm)}&num=10`;
       const response = await fetch(url, {
@@ -25,10 +25,20 @@ export const ResultContextProvider = ({ children }) => {
           'x-rapidapi-host': 'google-search72.p.rapidapi.com',
         },
       });
-
+  
       const data = await response.json();
       console.log('API Response:', data);
-      setResults(data.results || []);
+  
+      // Map response keys correctly
+      if (data.results) {
+        setResults(data.results);
+      } else if (data.entries) {
+        setResults(data.entries);
+      } else if (data.image_results) {
+        setResults(data.image_results);
+      } else {
+        setResults([]);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
       setResults([]);
