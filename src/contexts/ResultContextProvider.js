@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 
 const ResultContext = createContext();
-const baseUrl = 'https://google-search72.p.rapidapi.com/api/v1';
+const baseUrl = 'https://google-search72.p.rapidapi.com/';
 
 export const ResultContextProvider = ({ children }) => {
   const [results, setResults] = useState([]);
