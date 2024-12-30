@@ -14,8 +14,6 @@ export const ResultContextProvider = ({ children }) => {
   }, [searchTerm]);
 
   const getResults = async (type) => {
-  console.log('Current Search Term in Context:', searchTerm);
-
   if (!searchTerm || searchTerm.trim() === '') {
     console.error('Search term is missing or empty');
     return;
@@ -23,8 +21,8 @@ export const ResultContextProvider = ({ children }) => {
 
   setIsLoading(true);
 
+  // Adjust URL based on the type
   let url = `${baseUrl}search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`;
-
   if (type === 'news') {
     url = `${baseUrl}news/search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`;
   } else if (type === 'images') {
@@ -48,11 +46,11 @@ export const ResultContextProvider = ({ children }) => {
     console.log('API Response:', data);
 
     if (type === 'news') {
-      setResults(data.entries || []);
+      setResults(data.entries || []); // Assuming 'entries' contains news results
     } else if (type === 'images') {
-      setResults(data.image_results || []);
+      setResults(data.image_results || []); // Assuming 'image_results' contains image results
     } else {
-      setResults(data.results || []);
+      setResults(data.results || []); // Default web results
     }
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -61,6 +59,7 @@ export const ResultContextProvider = ({ children }) => {
     setIsLoading(false);
   }
 };
+
 
 
   return (
