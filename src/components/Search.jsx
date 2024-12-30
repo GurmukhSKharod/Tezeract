@@ -10,7 +10,9 @@ export const Search = () => {
   const [debouncedValue] = useDebounce(text, 300);
 
   useEffect(() => {
+    console.log('Debounced Value:', debouncedValue);
     if (debouncedValue.trim()) {
+      console.log('Updating search term in context:', debouncedValue.trim());
       setSearchTerm(debouncedValue.trim());
     }
   }, [debouncedValue, setSearchTerm]);
@@ -22,7 +24,10 @@ export const Search = () => {
         type="text"
         className="sm:w-96 w-80 h-10 dark:bg-gray-200  border rounded-full shadow-sm outline-none p-6 text-black hover:shadow-lg"
         placeholder="🔎 Search Google or type URL"
-        onChange={(e) => setText(e.target.value)}
+        onChange={(e) => {
+          console.log('Input changed:', e.target.value);
+          setText(e.target.value);
+        }}
       />
       {text && (
         <button type="button" className="absolute top-1.5 right-4 text-2xl text-gray-500 " onClick={() => setText('')}>
