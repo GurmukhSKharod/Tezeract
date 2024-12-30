@@ -34,6 +34,7 @@ export const ResultContextProvider = ({ children }) => {
     }
 
     const data = await response.json();
+    console.log('API Response:', data);
 
     // Update the results based on the type of data returned
     if (type === 'news') {
