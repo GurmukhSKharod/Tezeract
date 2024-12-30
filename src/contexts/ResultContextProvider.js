@@ -11,7 +11,7 @@ export const ResultContextProvider = ({ children }) => {
   const getResults = async (type, searchTerm) => {
   setIsLoading(true);
 
-  let url = `${baseUrl}search?q=${searchTerm}&lr=en-US&num=10`; // Default for web search
+  let url = `${baseUrl}search?q=${encodeURIComponent(searchTerm)}&lr=en-US&num=10`; // Default for web search
   
   // Adjust the endpoint or query parameters for specific types
   if (type === 'news') {
