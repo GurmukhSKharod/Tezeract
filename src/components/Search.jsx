@@ -5,32 +5,27 @@ import { useResultContext } from '../contexts/ResultContextProvider';
 import { Links } from './Links';
 
 export const Search = () => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState('Software Development');
   const { setSearchTerm } = useResultContext();
   const [debouncedValue] = useDebounce(text, 300);
 
   useEffect(() => {
-    if (debouncedValue.trim()) {
-      console.log('Updating search term in context:', debouncedValue.trim());
-      setSearchTerm(debouncedValue.trim());
+    if (debouncedValue) {
+      setSearchTerm(debouncedValue);
     }
   }, [debouncedValue, setSearchTerm]);
 
-    
   return (
     <div className="relative sm:ml-48 md:ml-72 sm:-mt-10 mt-3">
       <input
         value={text}
         type="text"
-        className="sm:w-96 w-80 h-10 dark:bg-gray-200  border rounded-full shadow-sm outline-none p-6 text-black hover:shadow-lg"
+        className="sm:w-96 w-80 h-10 dark:bg-gray-200 border rounded-full shadow-sm outline-none p-6 text-black hover:shadow-lg"
         placeholder="🔎 Search Google or type URL"
-        onChange={(e) => {
-          console.log('Input changed:', e.target.value);
-          setText(e.target.value);
-        }}
+        onChange={(e) => setText(e.target.value)}
       />
-      {text && (
-        <button type="button" className="absolute top-1.5 right-4 text-2xl text-gray-500 " onClick={() => setText('')}>
+      {!text && (
+        <button type="button" className="absolute top-1.5 right-4 text-2xl text-gray-500" onClick={() => setText('')}>
           x
         </button>
       )}
