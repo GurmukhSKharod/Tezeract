@@ -8,14 +8,14 @@ export const ResultContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const getResults = async () => {
+  const getResults = async (type) => {
     if (!searchTerm) {
-      console.error('Search term is missing');
+      console.error('Search term is missing or empty');
       return;
     }
-  
+
     setIsLoading(true);
-  
+
     try {
       const url = `${baseUrl}search?q=${encodeURIComponent(searchTerm)}&num=10`;
       const response = await fetch(url, {
@@ -25,19 +25,17 @@ export const ResultContextProvider = ({ children }) => {
           'x-rapidapi-host': 'google-search72.p.rapidapi.com',
         },
       });
-  
+
       const data = await response.json();
       console.log('API Response:', data);
-  
-      // Map response keys correctly
-      if (data.results) {
-        setResults(data.results);
-      } else if (data.entries) {
-        setResults(data.entries);
-      } else if (data.image_results) {
-        setResults(data.image_results);
+
+      // Update the results based on the type of data returned
+      if (type === '/news') {
+        setResults(data.entries || []);
+      } else if (type === '/images') {
+        setResults(data.image_results || []);
       } else {
-        setResults([]);
+        setResults(data.results || []);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -48,9 +46,7 @@ export const ResultContextProvider = ({ children }) => {
   };
 
   return (
-    <ResultContext.Provider
-      value={{ results, isLoading, searchTerm, setSearchTerm, getResults }}
-    >
+    <ResultContext.Provider value={{ getResults, results, searchTerm, setSearchTerm, isLoading }}>
       {children}
     </ResultContext.Provider>
   );
