@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDebounce } from 'use-debounce';
 import { useResultContext } from '../contexts/ResultContextProvider';
 import { Links } from './Links';
@@ -6,9 +6,9 @@ import { Links } from './Links';
 export const Search = () => {
   const [text, setText] = useState(''); // Controlled input for the search bar
   const { setSearchTerm } = useResultContext();
-  const [debouncedValue] = useDebounce(text, 300); // Debouncing for efficient API calls
+  const [debouncedValue] = useDebounce(text, 300); // Debounce input for efficient API calls
 
-  // Update the search term when debouncedValue changes
+  // Update search term when debouncedValue changes
   useEffect(() => {
     if (debouncedValue) {
       setSearchTerm(debouncedValue);
@@ -17,12 +17,12 @@ export const Search = () => {
 
   return (
     <div className="relative sm:ml-48 md:ml-72 sm:mt-10 mt-3">
-      {/* Search Input Field */}
+      {/* Search Bar */}
       <input
         value={text}
         type="text"
-        className="sm:w-96 w-80 h-10 dark:bg-gray-200 border rounded-full shadow-sm outline-none p-6 text-black hover:shadow-lg"
         placeholder="Search Tezeract 🔎"
+        className="sm:w-96 w-80 h-10 dark:bg-gray-200 border rounded-full shadow-sm outline-none p-6 text-black hover:shadow-lg"
         onChange={(e) => setText(e.target.value)}
       />
       {/* Clear Button */}
@@ -35,8 +35,7 @@ export const Search = () => {
           ✖
         </button>
       )}
-
-      {/* Links (All | News | Images | Videos) */}
+      {/* Navigation Links (All, News, Images, Videos) */}
       <Links />
     </div>
   );
