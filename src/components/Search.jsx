@@ -4,11 +4,10 @@ import { useResultContext } from '../contexts/ResultContextProvider';
 import { Links } from './Links';
 
 export const Search = () => {
-  const [text, setText] = useState(''); // Controlled input for the search bar
+  const [text, setText] = useState('');
   const { setSearchTerm } = useResultContext();
-  const [debouncedValue] = useDebounce(text, 300); // Debounce input for efficient API calls
+  const [debouncedValue] = useDebounce(text, 300);
 
-  // Update search term when debouncedValue changes
   useEffect(() => {
     if (debouncedValue) {
       setSearchTerm(debouncedValue);
@@ -17,7 +16,6 @@ export const Search = () => {
 
   return (
     <div className="relative sm:ml-48 md:ml-72 sm:mt-10 mt-3">
-      {/* Search Bar */}
       <input
         value={text}
         type="text"
@@ -25,7 +23,6 @@ export const Search = () => {
         className="sm:w-96 w-80 h-10 dark:bg-gray-200 border rounded-full shadow-sm outline-none p-6 text-black hover:shadow-lg"
         onChange={(e) => setText(e.target.value)}
       />
-      {/* Clear Button */}
       {text && (
         <button
           type="button"
@@ -35,7 +32,6 @@ export const Search = () => {
           ✖
         </button>
       )}
-      {/* Navigation Links (All, News, Images, Videos) */}
       <Links />
     </div>
   );
