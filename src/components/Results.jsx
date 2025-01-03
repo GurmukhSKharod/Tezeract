@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import ReactPlayer from 'react-player';
+
 import { useResultContext } from '../contexts/ResultContextProvider';
 import { Loading } from './Loading';
 
@@ -15,13 +17,15 @@ export const Results = () => {
         getResults(`${location.pathname}/q=${searchTerm}&num=40`);
       }
     }
-  }, [searchTerm, location.pathname, getResults]);
+  }, [searchTerm, location.pathname]);
 
   if (isLoading) return <Loading />;
 
   if (!results || results.length === 0) {
-    return <p className="text-center mt-10 text-lg">No results found.</p>;
+    return <p className="text-center">No results found</p>;
   }
+
+  console.log('Results:', results);
 
   switch (location.pathname) {
     case '/search':
@@ -40,10 +44,10 @@ export const Results = () => {
     case '/images':
       return (
         <div className="flex flex-wrap justify-center items-center">
-          {results?.map(({ image, link: { href, title } }, index) => (
-            <a href={href} target="_blank" key={index} rel="noreferrer" className="sm:p-3 p-5">
-              <img src={image?.src} alt={title} loading="lazy" />
-              <p className="sm:w-36 w-36 break-words text-sm mt-2">{title}</p>
+          {results?.map(({ image, link }, index) => (
+            <a href={link?.href} target="_blank" key={index} rel="noreferrer" className="sm:p-3 p-5">
+              {image?.src && <img src={image.src} alt={link?.title} loading="lazy" />}
+              <p className="sm:w-36 w-36 break-words text-sm mt-2">{link?.title}</p>
             </a>
           ))}
         </div>
@@ -57,9 +61,7 @@ export const Results = () => {
                 <p className="text-lg dark:text-blue-300 text-blue-700">{title}</p>
               </a>
               <div className="flex gap-4">
-                <a href={source?.href} target="_blank" rel="noreferrer" className="hover:underline hover:text-blue-300">
-                  {source?.href}
-                </a>
+                <a href={source?.href} target="_blank" rel="noreferrer" className="hover:underline hover:text-blue-300">{source?.href}</a>
               </div>
             </div>
           ))}
@@ -71,20 +73,13 @@ export const Results = () => {
           {results?.map((video, index) => (
             <div key={index} className="p-2">
               {video?.additional_links?.[0]?.href && (
-                <iframe
-                  src={video.additional_links[0].href}
-                  width="355"
-                  height="200"
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                  title="video"
-                ></iframe>
+                <ReactPlayer url={video.additional_links[0].href} controls width="355px" height="200px" />
               )}
             </div>
           ))}
         </div>
       );
     default:
-      return 'Error...';
+      return <p>Error...</p>;
   }
 };
